@@ -2,6 +2,7 @@
 
 namespace Scheb\TwoFactorBundle\Security\TwoFactor\Trusted;
 
+use AppBundle\Entity\User\TrustedComputer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Cookie;
 use Scheb\TwoFactorBundle\Model\TrustedComputerInterface;
@@ -61,9 +62,9 @@ class TrustedCookieManager
      */
     public function isTrustedComputer(Request $request, TrustedComputerInterface $user)
     {
+
         if ($request->cookies->has($this->cookieName)) {
             $tokenList = explode(';', $request->cookies->get($this->cookieName));
-
             // Interate over trusted tokens and validate them
             foreach ($tokenList as $token) {
                 if ($user->isTrustedComputer($token)) {
@@ -93,11 +94,18 @@ class TrustedCookieManager
         $validUntil = $this->getDateTimeNow()->add(new \DateInterval('PT'.$this->cookieLifetime.'S'));
 
         // Add token to user entity
-        $user->addTrustedComputer($token, $validUntil);
+        $trustedComputer = new TrustedComputer();
+        $trustedComputer->setToken($token);
+        $trustedComputer->setValidUntil($validUntil);
+        $trustedComputer->setUser($user);
+        // .. add user agent etc
+        $user->addTrustedComputer($trustedComputer);
+
+        $this->persister->persist($trustedComputer);
         $this->persister->persist($user);
 
         // Create cookie
-        return new Cookie($this->cookieName, $tokenList, $validUntil, '/', null, $this->cookieSecure);
+        return new Cookie($this->cookieName, $tokenList, $validUntil, '/', '.' . $request->getHost(), $this->cookieSecure);
     }
 
     /**
