@@ -2,15 +2,19 @@
 
 namespace Scheb\TwoFactorBundle\Model;
 
+use AppBundle\Entity\User\TrustedComputer;
+
+/**
+ * Interface TrustedComputerInterface
+ */
 interface TrustedComputerInterface
 {
     /**
      * Add a trusted computer token.
      *
-     * @param string    $token
-     * @param \DateTime $validUntil
+     * @param $trustedComputer TrustedComputer
      */
-    public function addTrustedComputer($token, \DateTime $validUntil);
+    public function addTrustedComputer(TrustedComputer $trustedComputer);
 
     /**
      * Validate a trusted computer token.
