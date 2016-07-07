@@ -35,11 +35,12 @@ class SchebTwoFactorExtension extends Extension
         $container->setParameter('scheb_two_factor.exclude_pattern', $config['exclude_pattern']);
 
         // Load two-factor modules
-        if ($config['email']['enabled'] === true) {
-            $this->configureEmail($container, $config);
-        }
+
         if ($config['google']['enabled'] === true) {
             $this->configureGoogle($container);
+        }
+        if ($config['email']['enabled'] === true) {
+            $this->configureEmail($container, $config);
         }
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
